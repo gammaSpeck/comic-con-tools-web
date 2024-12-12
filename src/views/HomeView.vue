@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router'
 const tools = [
   {
     id: 1,
-    name: 'Whatsapp chat activity tracker',
+    name: 'Whatsapp chat counter',
     description: 'Analyze and track message activity within a WhatsApp chat.',
   },
 ]

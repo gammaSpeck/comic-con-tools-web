@@ -3,12 +3,15 @@ import { calculateUserChatCounts, type UserMessageCount } from '@/utils'
 import { ref } from 'vue'
 
 const file = ref<File | null>(null)
+const errMsg = ref<string>('')
 const userChatCountMap = ref<UserMessageCount | null>(null)
 
 function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement
   if (!input.files?.length) return
   file.value = input.files[0]
+  const isTextFile = file.value.type === 'text/plain' || file.value.name.endsWith('.txt')
+  errMsg.value = isTextFile ? '' : 'Only .txt files are allowed.'
 }
 
 function handleSubmit() {
@@ -33,8 +36,11 @@ function handleSubmit() {
         counting the number of messages sent by each individual in that group.
       </p>
 
-      <form @submit.prevent="handleSubmit" class="bg-white p-6 rounded-lg shadow-md">
-        <div class="mb-4">
+      <form
+        @submit.prevent="handleSubmit"
+        class="bg-white p-6 rounded-lg shadow-md flex flex-col gap-3"
+      >
+        <div>
           <label class="block text-gray-700 text-sm font-bold mb-2" for="file-input">
             Upload a WhatsApp chat export (.txt):
           </label>
@@ -44,11 +50,13 @@ function handleSubmit() {
             accept=".txt"
             @change="handleFileChange"
             class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+            :class="{
+              'focus:ring-red-300 border-red-500': !!errMsg,
+            }"
           />
-        </div>
 
-        <div v-if="file?.name" class="mt-2 mb-4 text-sm text-gray-600">
-          Selected File: {{ file.name }}
+          <p v-if="errMsg" class="mt-1 text-red-500 text-sm">{{ errMsg }}</p>
+          <p v-else-if="file" class="mt-1 text-sm text-gray-600">Selected File: {{ file.name }}</p>
         </div>
 
         <button
