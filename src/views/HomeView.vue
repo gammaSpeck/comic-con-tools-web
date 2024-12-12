@@ -11,11 +11,11 @@ const tools = [
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto px-4">
+  <div class="max-w-2xl mx-auto">
     <h2 class="text-2xl text-center text-gray-700 mb-4">Tools</h2>
 
     <div class="flex items-center justify-center">
-      <RouterLink to="/activity-tracker">
+      <RouterLink to="/chat-counter">
         <div
           class="bg-white transform transition-transform duration-300 hover:translate-y-[-5px] shadow-md hover:shadow-lg rounded-lg overflow-hidden w-60 cursor-pointer"
         >
