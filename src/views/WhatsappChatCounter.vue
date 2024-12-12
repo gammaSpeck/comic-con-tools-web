@@ -24,6 +24,11 @@ function handleSubmit() {
   reader.onerror = () => console.error('Error reading the file')
   reader.readAsText(file.value)
 }
+
+function reset() {
+  file.value = null
+  userChatCountMap.value = null
+}
 </script>
 
 <template>
@@ -68,8 +73,11 @@ function handleSubmit() {
         </button>
       </form>
 
-      <div v-if="userChatCountMap && Object.keys(userChatCountMap).length > 0" class="mt-8">
-        <h2 class="text-xl font-semibold mb-4">Chat Activity Results</h2>
+      <div
+        v-if="userChatCountMap && Object.keys(userChatCountMap).length > 0"
+        class="mt-8 flex flex-col gap-3"
+      >
+        <h2 class="text-xl font-semibold">Chat Activity Results</h2>
         <div
           class="grid grid-cols-2 gap-x-4 bg-gray-200 text-gray-600 uppercase text-sm leading-normal"
         >
@@ -85,6 +93,13 @@ function handleSubmit() {
           <div class="py-3 px-6 whitespace-nowrap">{{ name }}</div>
           <div class="py-3 px-6">{{ count }}</div>
         </div>
+
+        <button
+          class="bg-red-400 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-200 hover:bg-red-500"
+          @click="reset"
+        >
+          Reset
+        </button>
       </div>
     </div>
   </div>
