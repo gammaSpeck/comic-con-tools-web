@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { calculateUserChatCounts, type UserMessageCount } from '@/utils'
+import { calculateUserChatCounts, validateWhatsappExport, type UserMessageCount } from '@/utils'
 import { ref } from 'vue'
 
 const file = ref<File | null>(null)
@@ -16,9 +16,14 @@ function handleFileChange(event: Event) {
 
 function handleSubmit() {
   if (!file.value) return
+
   const reader = new FileReader()
   reader.onload = (event) => {
     const fileContent = event.target?.result as string
+    const { isValid, err } = validateWhatsappExport(fileContent)
+
+    if (!isValid) return (errMsg.value = err)
+
     userChatCountMap.value = calculateUserChatCounts(fileContent)
   }
   reader.onerror = () => console.error('Error reading the file')
@@ -34,7 +39,7 @@ function reset() {
 <template>
   <div class="bg-gray-100 min-h-screen">
     <div class="max-w-lg mx-auto px-4">
-      <h2 class="text-2xl font-bold text-left text-blue-400 mb-4">Whatsapp Chat Counter</h2>
+      <h2 class="text-2xl font-bold text-left text-green-600 mb-4">Whatsapp Chat Counter</h2>
 
       <p class="text-md text-left text-gray-700 mb-6">
         This tool will help you track the activity of the users in any WhatsApp group or a DM by
@@ -54,7 +59,7 @@ function reset() {
             type="file"
             accept=".txt"
             @change="handleFileChange"
-            class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+            class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 cursor-pointer"
             :class="{
               'focus:ring-red-300 border-red-500': !!errMsg,
             }"
@@ -66,7 +71,7 @@ function reset() {
 
         <button
           type="submit"
-          class="bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 hover:bg-blue-700"
+          class="bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 hover:bg-blue-700 cursor-pointer"
           :disabled="!file"
         >
           Upload and Analyze

@@ -4,6 +4,16 @@ export type UserMessageCount = {
 
 const IGNORE_STRINGS = ['created group', 'added '] as const
 
+export function validateWhatsappExport(content: string) {
+  const newlineIndex = content.indexOf('\n')
+  const firstLine = newlineIndex !== -1 ? content.substring(0, newlineIndex) : content
+  if (!firstLine) return { isValid: false, err: 'Empty file contents.' }
+  const exportedLinePattern = /^\d{2}\/\d{2}\/\d{2}, \d{2}:\d{2} - .+$/
+  const isValid = exportedLinePattern.test(firstLine)
+  if (!isValid) return { isValid, err: 'The file contents are in an incorrect format' }
+  return { isValid: true, err: '' }
+}
+
 function parseDate(dateStr: string): Date {
   const [day, month, year] = dateStr.split('/').map(Number)
   return new Date(year + 2000, month - 1, day) // Add 2000 to year to avoid centuries ambiguity

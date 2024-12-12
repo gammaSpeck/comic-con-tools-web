@@ -19,12 +19,16 @@ const tools = [
         <div
           class="bg-white transform transition-transform duration-300 hover:translate-y-[-5px] shadow-md hover:shadow-lg rounded-lg overflow-hidden w-60 cursor-pointer"
         >
-          <div class="bg-gray-200 h-48 flex items-center justify-center">
-            <p class="text-lg text-gray-500">Image Placeholder</p>
+          <div class="bg-gray-200 h-50 flex items-center justify-center">
+            <img
+              src="/WhatsappAnalysis.webp"
+              alt="WhatsApp Analysis"
+              class="object-cover w-full h-full"
+            />
           </div>
 
           <div class="p-6">
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">
+            <h3 class="text-xl font-semibold text-green-600 mb-2">
               {{ tools[0].name }}
             </h3>
 
