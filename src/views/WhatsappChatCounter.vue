@@ -13,6 +13,9 @@ function handleFileChange(event: Event) {
   file.value = input.files[0]
   const isTextFile = file.value.type === 'text/plain' || file.value.name.endsWith('.txt')
   errMsg.value = isTextFile ? '' : 'Only .txt files are allowed.'
+
+  // Resets past results
+  userChatCountMap.value = null
 }
 
 function handleSubmit() {
@@ -75,9 +78,9 @@ function reset() {
         <button
           type="submit"
           class="bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 hover:bg-blue-700 cursor-pointer"
-          :disabled="!file"
+          :disabled="!file || !!errMsg"
         >
-          Upload and Analyze
+          Analyze
         </button>
       </form>
 
