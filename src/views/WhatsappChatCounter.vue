@@ -2,6 +2,7 @@
 import { calculateUserChatCounts, validateWhatsappExport, type UserMessageCount } from '@/utils'
 import { ref } from 'vue'
 
+const form = ref<HTMLFormElement | null>(null)
 const file = ref<File | null>(null)
 const errMsg = ref<string>('')
 const userChatCountMap = ref<UserMessageCount | null>(null)
@@ -33,6 +34,7 @@ function handleSubmit() {
 function reset() {
   file.value = null
   userChatCountMap.value = null
+  form.value?.reset()
 }
 </script>
 
@@ -47,6 +49,7 @@ function reset() {
       </p>
 
       <form
+        ref="form"
         @submit.prevent="handleSubmit"
         class="bg-white p-6 rounded-lg shadow-md flex flex-col gap-3"
       >
