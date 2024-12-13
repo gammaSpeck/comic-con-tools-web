@@ -37,7 +37,7 @@ function reset() {
 </script>
 
 <template>
-  <div class="bg-gray-100 min-h-screen">
+  <div class="bg-gray-100">
     <div class="max-w-lg mx-auto px-4">
       <h2 class="text-2xl font-bold text-left text-green-600 mb-4">Whatsapp Chat Counter</h2>
 
@@ -100,7 +100,7 @@ function reset() {
         </div>
 
         <button
-          class="bg-red-400 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-200 hover:bg-red-500"
+          class="bg-red-400 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-200 hover:bg-red-500 mt-4"
           @click="reset"
         >
           Reset
