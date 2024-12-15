@@ -8,8 +8,10 @@ export function validateWhatsappExport(content: string) {
   const newlineIndex = content.indexOf('\n')
   const firstLine = newlineIndex !== -1 ? content.substring(0, newlineIndex) : content
   if (!firstLine) return { isValid: false, err: 'Empty file contents.' }
-  const exportedLinePattern = /^\d{2}\/\d{2}\/\d{2}, \d{2}:\d{2} - .+$/
+  // This checks for chat export patterns of 12hr format with AM/PM and 24 hr format
+  const exportedLinePattern = /^\d{2}\/\d{2}\/\d{2}, \s*\d{1,2}:\d{2}\s*([APap][mM])?\s*-\s*.+$/
   const isValid = exportedLinePattern.test(firstLine)
+  debugger
   if (!isValid) return { isValid, err: 'The file contents are in an incorrect format' }
   return { isValid: true, err: '' }
 }
