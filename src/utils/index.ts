@@ -11,7 +11,6 @@ export function validateWhatsappExport(content: string) {
   // This checks for chat export patterns of 12hr format with AM/PM and 24 hr format
   const exportedLinePattern = /^\d{2}\/\d{2}\/\d{2}, \s*\d{1,2}:\d{2}\s*([APap][mM])?\s*-\s*.+$/
   const isValid = exportedLinePattern.test(firstLine)
-  debugger
   if (!isValid) return { isValid, err: 'The file contents are in an incorrect format' }
   return { isValid: true, err: '' }
 }
@@ -22,17 +21,30 @@ function parseDate(dateStr: string): Date {
 }
 
 /** Keep `minDate` in dd/mm/yy format */
-export function calculateUserChatCounts(fileContent: string, minDate?: Date): UserMessageCount {
+export function calculateUserChatCounts(
+  fileContent: string,
+  minDate?: Date | null,
+  maxDate?: Date | null,
+): UserMessageCount {
+  // This is done to ignore the time component set from the date component
+  const normalizedMinDate = minDate
+    ? new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate())
+    : null
+  const normalizedMaxDate = maxDate
+    ? new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate())
+    : null
+
   const lines = fileContent.split('\n') // Split file content into lines
 
   const userMessageCount = lines.reduce<UserMessageCount>((countMap, line) => {
     const matchDate = line.match(/^(\d{2}\/\d{2}\/\d{2})/)
     const match = line.match(/ - (.+?): /) // Match lines with the pattern `- <name>:`
 
-    if (!match || !match[1] || !matchDate || !matchDate[1]) return countMap // Skip messages earlier than minDate
+    if (!match || !match[1] || !matchDate || !matchDate[1]) return countMap
     const messageDate = parseDate(matchDate[1])
 
-    if (minDate && messageDate < minDate) return countMap
+    if (normalizedMinDate && messageDate < normalizedMinDate) return countMap // Skip messages earlier than normalizedMinDate
+    if (normalizedMaxDate && messageDate > normalizedMaxDate) return countMap
 
     const userName = match[1].trim()
     if (IGNORE_STRINGS.some((str) => userName.includes(str))) return countMap
