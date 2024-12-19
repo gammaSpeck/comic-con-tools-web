@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { computed, reactive, ref } from 'vue'
+
+import {
+  calculateUserChatCounts,
+  generatePDF,
+  validateWhatsappExport,
+  type UserMessageCount,
+} from '@/utils'
+
 import AnalysisResults from '@/components/whatsapp-analysis/AnalysisResults.vue'
 import DateInput from '@/components/whatsapp-analysis/DateInput.vue'
 import ResetBtn from '@/components/whatsapp-analysis/ResetBtn.vue'
-import { calculateUserChatCounts, validateWhatsappExport, type UserMessageCount } from '@/utils'
-import { computed, reactive, ref } from 'vue'
 
 const form = ref<HTMLFormElement | null>(null)
 const file = ref<File | null>(null)
@@ -13,6 +20,9 @@ const dateFilter = reactive({
 })
 const errMsg = ref<string>('')
 const userChatCountMap = ref<UserMessageCount | null>(null)
+
+const resultsRef = ref<HTMLElement | null>(null)
+const isGeneratingPDF = ref(false)
 
 const startDate = computed(() => (dateFilter.startDate ? new Date(dateFilter.startDate) : null))
 const endDate = computed(() => (dateFilter.endDate ? new Date(dateFilter.endDate) : null))
@@ -51,6 +61,21 @@ function reset() {
   dateFilter.startDate = ''
   dateFilter.endDate = ''
   form.value?.reset()
+}
+
+async function downloadPdf() {
+  if (!resultsRef.value || !file.value) return
+
+  isGeneratingPDF.value = true
+  try {
+    const pdf = await generatePDF(resultsRef.value)
+    pdf.save(`${file.value.name}-results.pdf`)
+  } catch (error) {
+    console.error('Error generating PDF:', error)
+    alert('Failed to generate PDF. Contact Support.')
+  } finally {
+    isGeneratingPDF.value = false
+  }
 }
 </script>
 
@@ -126,19 +151,27 @@ function reset() {
         </div>
       </form>
 
-      <div
-        class="mt-4 flex flex-col gap-3 bg-white p-6 rounded-lg shadow-md"
-        v-if="file && userChatCountMap"
-      >
-        <AnalysisResults
-          v-if="Object.keys(userChatCountMap).length"
-          :fileName="file.name"
-          :userCounts="userChatCountMap"
-          :startDate="dateFilter.startDate"
-          :endDate="dateFilter.endDate"
-        />
-        <p v-else class="text-gray-700">There were no results found for selected filters.</p>
-        <ResetBtn @reset="reset" />
+      <div class="mt-4 flex flex-col gap-3" v-if="file && userChatCountMap">
+        <div class="bg-white p-6 rounded-lg shadow-md" ref="resultsRef">
+          <AnalysisResults
+            :fileName="file.name"
+            :userCounts="userChatCountMap"
+            :startDate="dateFilter.startDate"
+            :endDate="dateFilter.endDate"
+          />
+        </div>
+
+        <div class="flex gap-6">
+          <ResetBtn @reset="reset" :disabled="isGeneratingPDF" />
+
+          <button
+            :disabled="isGeneratingPDF"
+            class="border border-blue-400 text-blue-400 font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-blue-100 cursor-pointer"
+            @click="downloadPdf"
+          >
+            {{ isGeneratingPDF ? 'Generating PDF...' : 'Download PDF' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
