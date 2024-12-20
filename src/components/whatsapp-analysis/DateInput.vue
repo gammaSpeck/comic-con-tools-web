@@ -29,7 +29,7 @@ function handleInput(event: Event) {
       :min="min"
       :max="max"
       :disabled="disabled"
-      class="p-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 cursor-pointer"
+      class="p-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 cursor-pointer disabled:cursor-not-allowed"
     />
   </div>
 </template>

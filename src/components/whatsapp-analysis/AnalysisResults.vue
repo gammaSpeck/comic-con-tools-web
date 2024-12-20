@@ -6,6 +6,7 @@ interface Props {
   fileName: string
   startDate?: string | null
   endDate?: string | null
+  filterByStr?: string
 }
 
 const props = defineProps<Props>()
@@ -18,7 +19,7 @@ const props = defineProps<Props>()
       <p>
         Exported file name:
         <span class="font-bold">
-          {{ props.fileName }}
+          {{ fileName }}
         </span>
       </p>
 
@@ -31,6 +32,13 @@ const props = defineProps<Props>()
         <template v-if="endDate">
           end date: <span class="font-bold">{{ format(endDate, 'dd/MM/yyyy') }}</span>
         </template>
+      </p>
+
+      <p v-if="filterByStr">
+        Filtered by string:
+        <span class="font-bold">
+          {{ filterByStr }}
+        </span>
       </p>
     </div>
 

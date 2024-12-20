@@ -19,6 +19,8 @@ const dateFilter = reactive({
   endDate: '',
 })
 const errMsg = ref<string>('')
+const customFilterStr = ref<string>('')
+
 const userChatCountMap = ref<UserMessageCount | null>(null)
 
 const resultsRef = ref<HTMLElement | null>(null)
@@ -49,7 +51,12 @@ function handleSubmit() {
 
     if (!isValid) return (errMsg.value = err)
 
-    userChatCountMap.value = calculateUserChatCounts(fileContent, startDate.value, endDate.value)
+    userChatCountMap.value = calculateUserChatCounts(
+      fileContent,
+      startDate.value,
+      endDate.value,
+      customFilterStr.value,
+    )
   }
   reader.onerror = () => console.error('Error reading the file')
   reader.readAsText(file.value)
@@ -60,6 +67,7 @@ function reset() {
   userChatCountMap.value = null
   dateFilter.startDate = ''
   dateFilter.endDate = ''
+  customFilterStr.value = ''
   form.value?.reset()
 }
 
@@ -104,7 +112,7 @@ async function downloadPdf() {
             accept=".txt"
             :disabled="!!userChatCountMap"
             @change="handleFileChange"
-            class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 cursor-pointer"
+            class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 cursor-pointer disabled:cursor-not-allowed"
             :class="{
               'focus:ring-red-300 border-red-500': !!errMsg,
             }"
@@ -138,6 +146,21 @@ async function downloadPdf() {
           </div>
         </div>
 
+        <div>
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="filter-input">
+            Filter by string (optional)
+          </label>
+
+          <input
+            id="filter-input"
+            placeholder="Type custom filter string..."
+            v-model="customFilterStr"
+            type="text"
+            :disabled="!!userChatCountMap"
+            class="block w-full px-3 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
         <div class="flex gap-6">
           <ResetBtn @reset="reset" />
 
@@ -151,13 +174,14 @@ async function downloadPdf() {
         </div>
       </form>
 
-      <div class="mt-4 flex flex-col gap-3" v-if="file && userChatCountMap">
+      <div class="mt-4 flex flex-col gap-4" v-if="file && userChatCountMap">
         <div class="bg-white p-6 rounded-lg shadow-md" ref="resultsRef">
           <AnalysisResults
             :fileName="file.name"
             :userCounts="userChatCountMap"
             :startDate="dateFilter.startDate"
             :endDate="dateFilter.endDate"
+            :filterByStr="customFilterStr"
           />
         </div>
 
