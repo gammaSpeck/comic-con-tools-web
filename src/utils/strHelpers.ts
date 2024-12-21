@@ -25,6 +25,7 @@ export function calculateUserChatCounts(
   fileContent: string,
   minDate?: Date | null,
   maxDate?: Date | null,
+  filterStr?: string,
 ): UserMessageCount {
   // This is done to ignore the time component set from the date component
   const normalizedMinDate = minDate
@@ -34,21 +35,41 @@ export function calculateUserChatCounts(
     ? new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate())
     : null
 
-  const lines = fileContent.split('\n') // Split file content into lines
+  /**
+   * Regular expression for identifying WhatsApp message boundaries.
+   * The regex uses a positive lookahead to effectively segment messages based on the typical format:
+   * `dd/mm/yy, HH:MM - Name:` or `dd/mm/yy, hh:mm AM/PM - Name:`
+   *
+   * (?=                         : Positive lookahead ensures matching the following pattern.
+   *   \d{2}\/\d{2}\/\d{2},      : Date in dd/mm/yy format followed by a comma, Eg `16/12/24,`.
+   *   \s*                       : Optional whitespace after the comma.
+   *   \d{1,2}:\d{2}             : Time in HH:MM or H:MM format, matches both 24-hour and 12-hour clocks.
+   *   (?:\s*[APap][Mm])?        : Non-capturing group for optional AM/PM or am/pm, with possible leading whitespace.
+   *   \s*-                      : Optional whitespace and dash separator.
+   *   \s*                       : Optional whitespace after the dash.
+   *   .+?                       : Lazily matches any character(s) representing the name before the colon.
+   *   :                         : Literal colon marking the end of name and beginning of message text.
+   * )
+   */
+  const messagePattern = /(?=\d{2}\/\d{2}\/\d{2},\s*\d{1,2}:\d{2}(?:\s*[APap][Mm])?\s*-\s*.+?:)/g
+  // Split the content based on the pattern
+  const lines = fileContent.split(messagePattern)
 
   const userMessageCount: UserMessageCount = {}
   for (const line of lines) {
     const matchDate = line.match(/^(\d{2}\/\d{2}\/\d{2})/)
-    const match = line.match(/ - (.+?): /) // Match lines with the pattern `- <name>:`
+    const matchName = line.match(/ - (.+?): /) // Match lines with the pattern `- <name>:`
 
-    if (!match || !match[1] || !matchDate || !matchDate[1]) continue
+    if (!matchName || !matchName[1] || !matchDate || !matchDate[1]) continue
 
     const messageDate = parseDate(matchDate[1])
     if (normalizedMinDate && messageDate < normalizedMinDate) continue
     if (normalizedMaxDate && messageDate > normalizedMaxDate) continue
 
-    const userName = match[1].trim()
+    const userName = matchName[1].trim()
     if (IGNORE_STRINGS.some((str) => userName.includes(str))) continue
+
+    if (filterStr && !new RegExp(filterStr, 'i').test(line)) continue
 
     // Increment user's message count
     userMessageCount[userName] = (userMessageCount[userName] || 0) + 1
