@@ -89,7 +89,7 @@ async function downloadPdf() {
 
 <template>
   <div class="bg-gray-100">
-    <div class="max-w-lg mx-auto px-4">
+    <div class="max-w-xl mx-auto px-0 lg:px-2">
       <h2 class="text-2xl font-bold text-left text-green-600 mb-4">Whatsapp Chat Counter</h2>
 
       <p class="text-left text-gray-700 mb-6">
