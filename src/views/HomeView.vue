@@ -21,7 +21,7 @@ const tools = [
         >
           <div class="bg-gray-200 h-50 flex items-center justify-center">
             <img
-              src="/WhatsappAnalysis.webp"
+              src="/images/WhatsappAnalysis.webp"
               alt="WhatsApp Analysis"
               class="object-cover w-full h-full"
             />
